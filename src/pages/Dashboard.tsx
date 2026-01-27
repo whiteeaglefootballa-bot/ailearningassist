@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useRealtimeProgress } from '@/hooks/useRealtimeProgress';
+import { StrengthsWeaknesses } from '@/components/dashboard/StrengthsWeaknesses';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import {
   BookOpen,
   Brain,
@@ -13,13 +13,11 @@ import {
   Clock,
   TrendingUp,
   ArrowRight,
-  Sparkles,
   Target,
   Flame,
+  Loader2,
 } from 'lucide-react';
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -28,15 +26,6 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-
-interface DashboardStats {
-  totalCourses: number;
-  completedLessons: number;
-  quizzesTaken: number;
-  averageScore: number;
-  studyStreak: number;
-  totalMinutes: number;
-}
 
 const weeklyData = [
   { day: 'Mon', minutes: 45, score: 72 },
@@ -57,14 +46,7 @@ const recentTopics = [
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState<DashboardStats>({
-    totalCourses: 5,
-    completedLessons: 23,
-    quizzesTaken: 12,
-    averageScore: 78,
-    studyStreak: 7,
-    totalMinutes: 450,
-  });
+  const { stats, loading } = useRealtimeProgress();
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
@@ -78,32 +60,32 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      title: 'Courses',
-      value: stats.totalCourses,
+      title: 'Lessons',
+      value: stats.totalLessonsCompleted,
       icon: BookOpen,
       color: 'from-chart-1 to-blue-600',
-      subtitle: 'In progress',
-    },
-    {
-      title: 'Lessons',
-      value: stats.completedLessons,
-      icon: Target,
-      color: 'from-chart-2 to-teal-600',
       subtitle: 'Completed',
     },
     {
       title: 'Quizzes',
-      value: stats.quizzesTaken,
-      icon: Trophy,
-      color: 'from-chart-4 to-orange-600',
+      value: stats.totalQuizzesTaken,
+      icon: Target,
+      color: 'from-chart-2 to-teal-600',
       subtitle: 'Taken',
     },
     {
       title: 'Avg Score',
       value: `${stats.averageScore}%`,
+      icon: Trophy,
+      color: 'from-chart-4 to-orange-600',
+      subtitle: 'Performance',
+    },
+    {
+      title: 'Study Time',
+      value: `${stats.totalMinutes}`,
       icon: TrendingUp,
       color: 'from-chart-3 to-green-600',
-      subtitle: 'Performance',
+      subtitle: 'Minutes',
     },
   ];
 
@@ -127,7 +109,7 @@ export default function Dashboard() {
           <Flame className="w-6 h-6" />
           <div>
             <p className="text-sm opacity-90">Study Streak</p>
-            <p className="text-xl font-bold">{stats.studyStreak} days</p>
+            <p className="text-xl font-bold">7 days</p>
           </div>
         </div>
       </motion.div>
@@ -147,7 +129,11 @@ export default function Dashboard() {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl md:text-3xl font-bold mt-1">{stat.value}</p>
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin mt-2" />
+                    ) : (
+                      <p className="text-2xl md:text-3xl font-bold mt-1">{stat.value}</p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
                   </div>
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
@@ -266,11 +252,20 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Topics Progress */}
+      {/* Strengths & Weaknesses */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
+      >
+        <StrengthsWeaknesses topicPerformance={stats.topicPerformance} />
+      </motion.div>
+
+      {/* Topics Progress */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
       >
         <Card className="border-0 shadow-lg">
           <CardHeader>
@@ -291,7 +286,7 @@ export default function Dashboard() {
                   key={topic.name}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
+                  transition={{ delay: 0.6 + index * 0.1 }}
                   className="space-y-2"
                 >
                   <div className="flex items-center justify-between">
@@ -302,7 +297,7 @@ export default function Dashboard() {
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${topic.progress}%` }}
-                      transition={{ duration: 1, delay: 0.6 + index * 0.1 }}
+                      transition={{ duration: 1, delay: 0.7 + index * 0.1 }}
                       className={`absolute inset-y-0 left-0 ${topic.color} rounded-full`}
                     />
                   </div>

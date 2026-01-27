@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { QuizImprovementSuggestions } from '@/components/quiz/QuizImprovementSuggestions';
 import { useToast } from '@/hooks/use-toast';
 import {
   Trophy,
@@ -127,12 +129,22 @@ export default function Quizzes() {
     setAnswers([...answers, selectedAnswer]);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (currentQuestionIndex < sampleQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setShowResult(false);
     } else {
+      // Save quiz attempt to database
+      if (user?.id && activeQuiz) {
+        await supabase.from('quiz_attempts').insert({
+          user_id: user.id,
+          quiz_id: activeQuiz.id.length > 10 ? activeQuiz.id : 'aaaa1111-1111-1111-1111-111111111111',
+          score: score + (selectedAnswer === currentQuestion?.correctAnswer ? 1 : 0),
+          total_questions: sampleQuestions.length,
+          answers: answers,
+        });
+      }
       setQuizCompleted(true);
     }
   };
@@ -256,9 +268,9 @@ export default function Quizzes() {
     );
   }
 
-  if (quizCompleted) {
+  if (quizCompleted && activeQuiz) {
     return (
-      <div className="p-4 md:p-6 lg:p-8 max-w-lg mx-auto">
+      <div className="p-4 md:p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -292,7 +304,7 @@ export default function Quizzes() {
               </div>
 
               <div className="flex gap-3 justify-center">
-                <Button variant="outline" onClick={() => startQuiz(activeQuiz!)}>
+                <Button variant="outline" onClick={() => startQuiz(activeQuiz)}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Retry
                 </Button>
@@ -303,6 +315,13 @@ export default function Quizzes() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Improvement Suggestions */}
+        <QuizImprovementSuggestions
+          score={score}
+          totalQuestions={sampleQuestions.length}
+          category={activeQuiz.category}
+        />
       </div>
     );
   }

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
+import { LearningPreferences } from '@/components/settings/LearningPreferences';
 import { useToast } from '@/hooks/use-toast';
 import { User, Bell, Shield, Palette, Save, Loader2 } from 'lucide-react';
 
@@ -183,11 +184,20 @@ export default function Settings() {
         </Card>
       </motion.div>
 
-      {/* Privacy Section */}
+      {/* Learning Preferences */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
+      >
+        <LearningPreferences />
+      </motion.div>
+
+      {/* Privacy Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
       >
         <Card className="border-0 shadow-lg">
           <CardHeader>
