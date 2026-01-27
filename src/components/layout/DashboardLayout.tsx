@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { GlobalSearch } from '@/components/search/GlobalSearch';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +23,6 @@ import {
   Menu,
   X,
   ChevronRight,
-  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -164,11 +164,14 @@ export default function DashboardLayout() {
             <span className="font-display font-bold">AI Learning</span>
           </div>
         </div>
-        <Avatar className="w-9 h-9">
-          <AvatarFallback className="bg-gradient-primary text-white text-sm">
-            {userInitials}
-          </AvatarFallback>
-        </Avatar>
+        <div className="flex items-center gap-2">
+          <GlobalSearch />
+          <Avatar className="w-9 h-9">
+            <AvatarFallback className="bg-gradient-primary text-white text-sm">
+              {userInitials}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </header>
 
       {/* Mobile Menu */}
