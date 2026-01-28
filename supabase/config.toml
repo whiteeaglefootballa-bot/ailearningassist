@@ -2,3 +2,6 @@ project_id = "vadjakjfjdahfiioqjlz"
 
 [functions.ai-tutor]
 verify_jwt = false
+
+[functions.generate-study-plan]
+verify_jwt = false
