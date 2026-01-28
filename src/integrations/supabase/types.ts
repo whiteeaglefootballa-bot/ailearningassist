@@ -266,6 +266,45 @@ export type Database = {
           },
         ]
       }
+      study_plans: {
+        Row: {
+          available_hours_per_week: number
+          created_at: string
+          goals: string[]
+          id: string
+          is_active: boolean | null
+          preferred_days: string[] | null
+          schedule: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_hours_per_week?: number
+          created_at?: string
+          goals?: string[]
+          id?: string
+          is_active?: boolean | null
+          preferred_days?: string[] | null
+          schedule?: Json
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_hours_per_week?: number
+          created_at?: string
+          goals?: string[]
+          id?: string
+          is_active?: boolean | null
+          preferred_days?: string[] | null
+          schedule?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_progress: {
         Row: {
           completed: boolean | null

@@ -11,6 +11,7 @@ import AITutor from "./pages/AITutor";
 import Courses from "./pages/Courses";
 import Quizzes from "./pages/Quizzes";
 import Settings from "./pages/Settings";
+import StudyPlan from "./pages/StudyPlan";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -79,6 +80,7 @@ function AppRoutes() {
         <Route path="tutor" element={<AITutor />} />
         <Route path="courses" element={<Courses />} />
         <Route path="quizzes" element={<Quizzes />} />
+        <Route path="study-plan" element={<StudyPlan />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<NotFound />} />

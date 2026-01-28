@@ -23,6 +23,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  CalendarDays,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +32,7 @@ const navItems = [
   { path: '/dashboard/tutor', icon: MessageSquare, label: 'AI Tutor' },
   { path: '/dashboard/courses', icon: BookOpen, label: 'Courses' },
   { path: '/dashboard/quizzes', icon: Trophy, label: 'Quizzes' },
+  { path: '/dashboard/study-plan', icon: CalendarDays, label: 'Study Plan' },
 ];
 
 export default function DashboardLayout() {
