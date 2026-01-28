@@ -305,6 +305,41 @@ export type Database = {
         }
         Relationships: []
       }
+      study_session_completions: {
+        Row: {
+          completed_at: string
+          day: string
+          id: string
+          session_index: number
+          study_plan_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          day: string
+          id?: string
+          session_index: number
+          study_plan_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          day?: string
+          id?: string
+          session_index?: number
+          study_plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_session_completions_study_plan_id_fkey"
+            columns: ["study_plan_id"]
+            isOneToOne: false
+            referencedRelation: "study_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_progress: {
         Row: {
           completed: boolean | null
