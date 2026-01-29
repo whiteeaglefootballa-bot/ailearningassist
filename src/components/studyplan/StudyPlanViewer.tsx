@@ -20,7 +20,9 @@ import {
   BookOpen,
   ArrowLeft,
   Sparkles,
+  Download,
 } from 'lucide-react';
+import { downloadICSFile } from '@/lib/ics-generator';
 
 interface StudySession {
   time: string;
@@ -192,6 +194,14 @@ export function StudyPlanViewer({ plan, onBack }: StudyPlanViewerProps) {
             <p className="text-muted-foreground">Your personalized weekly schedule</p>
           </div>
         </div>
+        <Button 
+          variant="outline" 
+          onClick={() => downloadICSFile(plan)}
+          className="gap-2"
+        >
+          <Download className="w-4 h-4" />
+          Export to Calendar
+        </Button>
       </div>
 
       {/* Stats */}
