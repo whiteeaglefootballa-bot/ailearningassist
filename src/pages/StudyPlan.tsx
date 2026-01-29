@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Plus, Calendar, Clock, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { StudyReminderToggle } from '@/components/studyplan/StudyReminderToggle';
 
 interface StoredPlan {
   id: string;
@@ -130,10 +131,13 @@ export default function StudyPlan() {
           <h1 className="text-2xl md:text-3xl font-display font-bold">Study Plans</h1>
           <p className="text-muted-foreground">AI-generated personalized weekly schedules</p>
         </div>
-        <Button onClick={() => setShowGenerator(true)} className="bg-gradient-primary hover:opacity-90">
-          <Plus className="w-4 h-4 mr-2" />
-          Create New Plan
-        </Button>
+        <div className="flex items-center gap-4">
+          <StudyReminderToggle />
+          <Button onClick={() => setShowGenerator(true)} className="bg-gradient-primary hover:opacity-90">
+            <Plus className="w-4 h-4 mr-2" />
+            Create New Plan
+          </Button>
+        </div>
       </div>
 
       {/* Plans List */}
