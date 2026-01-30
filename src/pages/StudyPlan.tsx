@@ -4,10 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { StudyPlanGenerator } from '@/components/studyplan/StudyPlanGenerator';
 import { StudyPlanViewer } from '@/components/studyplan/StudyPlanViewer';
+import { WeeklySummary } from '@/components/studyplan/WeeklySummary';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Plus, Calendar, Clock, Trash2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, Plus, Calendar, Clock, Trash2, BarChart3, List } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StudyReminderToggle } from '@/components/studyplan/StudyReminderToggle';
 
@@ -140,29 +142,43 @@ export default function StudyPlan() {
         </div>
       </div>
 
-      {/* Plans List */}
-      {plans.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card className="border-0 shadow-lg text-center py-12">
-            <CardContent>
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-display font-semibold mb-2">No study plans yet</h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Create your first AI-powered study plan to get a personalized weekly schedule based on your goals.
-              </p>
-              <Button onClick={() => setShowGenerator(true)} className="bg-gradient-primary hover:opacity-90">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Plan
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ) : (
+      {/* Tabs for Plans/Summary */}
+      <Tabs defaultValue="plans" className="space-y-6">
+        <TabsList className="bg-muted/50">
+          <TabsTrigger value="plans" className="gap-2">
+            <List className="w-4 h-4" />
+            My Plans
+          </TabsTrigger>
+          <TabsTrigger value="summary" className="gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Weekly Summary
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="plans">
+          {/* Plans List */}
+          {plans.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card className="border-0 shadow-lg text-center py-12">
+                <CardContent>
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-display font-semibold mb-2">No study plans yet</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Create your first AI-powered study plan to get a personalized weekly schedule based on your goals.
+                  </p>
+                  <Button onClick={() => setShowGenerator(true)} className="bg-gradient-primary hover:opacity-90">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Your First Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map((plan, index) => (
             <motion.div
@@ -217,13 +233,19 @@ export default function StudyPlan() {
                         {plan.preferred_days.length} days
                       </span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="summary">
+          <WeeklySummary />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
