@@ -34,6 +34,7 @@ import {
   Trophy,
   Loader2,
 } from 'lucide-react';
+import { StudyAchievements } from './StudyAchievements';
 
 interface StoredPlan {
   id: string;
@@ -443,6 +444,9 @@ export function WeeklySummary() {
           </Card>
         </motion.div>
       )}
+
+      {/* Achievements Section */}
+      <StudyAchievements />
     </div>
   );
 }
