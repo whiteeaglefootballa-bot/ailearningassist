@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import {
   Flame,
   Trophy,
@@ -19,6 +22,12 @@ import {
   CheckCircle2,
   Lock,
   Loader2,
+  Share2,
+  Twitter,
+  Linkedin,
+  Facebook,
+  Link2,
+  Download,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -83,6 +92,7 @@ interface StudyAchievementsProps {
 
 export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [stats, setStats] = useState({
     totalSessions: 0,
     currentStreak: 0,
@@ -92,6 +102,8 @@ export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
   });
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -212,6 +224,54 @@ export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
   };
 
   const unlockedCount = ACHIEVEMENTS.filter(a => isUnlocked(a)).length;
+  const unlockedAchievements = ACHIEVEMENTS.filter(a => isUnlocked(a));
+
+  const getShareText = (achievement?: Achievement | null) => {
+    if (achievement) {
+      return `🏆 I just unlocked "${achievement.name}" on my learning journey! ${achievement.description} #LearningGoals #Achievement`;
+    }
+    return `🎯 I've unlocked ${unlockedCount} achievements on my learning journey! Current streak: ${stats.currentStreak} days 🔥 #LearningGoals #StudyStreak`;
+  };
+
+  const getShareUrl = () => {
+    return window.location.origin;
+  };
+
+  const shareToTwitter = (achievement?: Achievement | null) => {
+    const text = getShareText(achievement);
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(getShareUrl())}`;
+    window.open(url, '_blank', 'width=550,height=420');
+  };
+
+  const shareToLinkedIn = (achievement?: Achievement | null) => {
+    const text = getShareText(achievement);
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareUrl())}&summary=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'width=550,height=420');
+  };
+
+  const shareToFacebook = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`;
+    window.open(url, '_blank', 'width=550,height=420');
+  };
+
+  const copyShareLink = async (achievement?: Achievement | null) => {
+    const text = getShareText(achievement);
+    await navigator.clipboard.writeText(`${text}\n\n${getShareUrl()}`);
+    toast({
+      title: 'Copied to clipboard!',
+      description: 'Share text has been copied',
+    });
+  };
+
+  const handleShareAchievement = (achievement: Achievement) => {
+    setSelectedAchievement(achievement);
+    setShareDialogOpen(true);
+  };
+
+  const handleShareAll = () => {
+    setSelectedAchievement(null);
+    setShareDialogOpen(true);
+  };
 
   if (loading) {
     return (
@@ -310,7 +370,20 @@ export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
                 {unlockedCount} of {ACHIEVEMENTS.length} unlocked
               </CardDescription>
             </div>
-            <Progress value={(unlockedCount / ACHIEVEMENTS.length) * 100} className="w-24 h-2" />
+            <div className="flex items-center gap-2">
+              <Progress value={(unlockedCount / ACHIEVEMENTS.length) * 100} className="w-24 h-2" />
+              {unlockedCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShareAll}
+                  className="gap-1"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -330,6 +403,7 @@ export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     className={cn(
+                      "group",
                       "relative p-3 rounded-xl border-2 transition-all",
                       unlocked 
                         ? TIER_BG[achievement.tier]
@@ -377,10 +451,23 @@ export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
                       </div>
                     )}
 
+                    {/* Share Button for Unlocked */}
+                    {unlocked && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShareAchievement(achievement);
+                        }}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <Share2 className="w-3 h-3 text-muted-foreground" />
+                      </button>
+                    )}
+
                     {/* Unlocked Shine Effect */}
                     {unlocked && (
                       <motion.div
-                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-foreground/5 to-transparent"
+                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-foreground/5 to-transparent pointer-events-none"
                         initial={{ x: '-100%' }}
                         animate={{ x: '200%' }}
                         transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
@@ -402,6 +489,107 @@ export function StudyAchievements({ compact = false }: StudyAchievementsProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Share Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5" />
+              Share Your Achievement
+            </DialogTitle>
+            <DialogDescription>
+              {selectedAchievement 
+                ? `Share "${selectedAchievement.name}" with your network`
+                : 'Share your learning progress with friends'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Achievement Preview Card */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border">
+            {selectedAchievement ? (
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "w-14 h-14 rounded-xl flex items-center justify-center",
+                  `bg-gradient-to-br ${TIER_COLORS[selectedAchievement.tier]} text-white`
+                )}>
+                  {selectedAchievement.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold">{selectedAchievement.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedAchievement.description}</p>
+                  <Badge className={cn("mt-1 text-[10px] uppercase", TIER_TEXT[selectedAchievement.tier])}>
+                    {selectedAchievement.tier}
+                  </Badge>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center space-y-2">
+                <div className="flex justify-center gap-2">
+                  {unlockedAchievements.slice(0, 5).map((a) => (
+                    <div
+                      key={a.id}
+                      className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center",
+                        `bg-gradient-to-br ${TIER_COLORS[a.tier]} text-white`
+                      )}
+                    >
+                      {a.icon}
+                    </div>
+                  ))}
+                  {unlockedCount > 5 && (
+                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-medium">
+                      +{unlockedCount - 5}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold">{unlockedCount} Achievements Unlocked</p>
+                  <p className="text-sm text-muted-foreground">
+                    🔥 {stats.currentStreak} day streak • {stats.totalHours}h studied
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Share Buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              onClick={() => shareToTwitter(selectedAchievement)}
+              className="gap-2"
+            >
+              <Twitter className="w-4 h-4" />
+              Twitter/X
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => shareToLinkedIn(selectedAchievement)}
+              className="gap-2"
+            >
+              <Linkedin className="w-4 h-4" />
+              LinkedIn
+            </Button>
+            <Button
+              variant="outline"
+              onClick={shareToFacebook}
+              className="gap-2"
+            >
+              <Facebook className="w-4 h-4" />
+              Facebook
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => copyShareLink(selectedAchievement)}
+              className="gap-2"
+            >
+              <Link2 className="w-4 h-4" />
+              Copy Link
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
