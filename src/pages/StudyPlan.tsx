@@ -5,11 +5,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { StudyPlanGenerator } from '@/components/studyplan/StudyPlanGenerator';
 import { StudyPlanViewer } from '@/components/studyplan/StudyPlanViewer';
 import { WeeklySummary } from '@/components/studyplan/WeeklySummary';
+import { LearningGoals } from '@/components/studyplan/LearningGoals';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Plus, Calendar, Clock, Trash2, BarChart3, List } from 'lucide-react';
+import { Loader2, Plus, Calendar, Clock, Trash2, BarChart3, List, Target } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { StudyReminderToggle } from '@/components/studyplan/StudyReminderToggle';
 
@@ -149,9 +150,13 @@ export default function StudyPlan() {
             <List className="w-4 h-4" />
             My Plans
           </TabsTrigger>
+          <TabsTrigger value="goals" className="gap-2">
+            <Target className="w-4 h-4" />
+            Goals
+          </TabsTrigger>
           <TabsTrigger value="summary" className="gap-2">
             <BarChart3 className="w-4 h-4" />
-            Weekly Summary
+            Summary
           </TabsTrigger>
         </TabsList>
 
@@ -240,6 +245,10 @@ export default function StudyPlan() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="goals">
+          <LearningGoals />
         </TabsContent>
 
         <TabsContent value="summary">

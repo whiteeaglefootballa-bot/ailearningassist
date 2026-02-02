@@ -77,6 +77,48 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_goals: {
+        Row: {
+          created_at: string
+          current_value: number
+          goal_type: string
+          id: string
+          is_active: boolean
+          period_start: string
+          target_value: number
+          title: string
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_value?: number
+          goal_type?: string
+          id?: string
+          is_active?: boolean
+          period_start?: string
+          target_value?: number
+          title: string
+          unit?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_value?: number
+          goal_type?: string
+          id?: string
+          is_active?: boolean
+          period_start?: string
+          target_value?: number
+          title?: string
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           content: string | null
