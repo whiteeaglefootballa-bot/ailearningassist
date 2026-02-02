@@ -22,8 +22,18 @@ interface StudyPlan {
   is_active: boolean | null;
 }
 
-const REMINDER_MINUTES_BEFORE = 15;
+export const REMINDER_OPTIONS = [5, 10, 15, 30] as const;
+export type ReminderMinutes = typeof REMINDER_OPTIONS[number];
+
 const CHECK_INTERVAL_MS = 60000; // Check every minute
+
+function getReminderMinutes(): ReminderMinutes {
+  const stored = localStorage.getItem('studyReminderMinutes');
+  if (stored && REMINDER_OPTIONS.includes(Number(stored) as ReminderMinutes)) {
+    return Number(stored) as ReminderMinutes;
+  }
+  return 15;
+}
 
 function parseTime(timeStr: string): { hours: number; minutes: number } | null {
   const cleanTime = timeStr.trim().toUpperCase();
@@ -59,6 +69,7 @@ export function useStudyReminders() {
   const [enabled, setEnabled] = useState(() => {
     return localStorage.getItem('studyRemindersEnabled') === 'true';
   });
+  const [reminderMinutes, setReminderMinutesState] = useState<ReminderMinutes>(getReminderMinutes);
   const notifiedSessionsRef = useRef<Set<string>>(new Set());
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -66,6 +77,13 @@ export function useStudyReminders() {
     const perm = await requestNotificationPermission();
     setPermission(perm);
     return perm;
+  }, []);
+
+  const setReminderMinutes = useCallback((minutes: ReminderMinutes) => {
+    setReminderMinutesState(minutes);
+    localStorage.setItem('studyReminderMinutes', String(minutes));
+    // Clear notified sessions so reminders recalculate with new timing
+    notifiedSessionsRef.current.clear();
   }, []);
 
   const enableReminders = useCallback(async () => {
@@ -113,7 +131,7 @@ export function useStudyReminders() {
         // Check if session is coming up in the reminder window
         if (
           minutesUntilSession > 0 &&
-          minutesUntilSession <= REMINDER_MINUTES_BEFORE &&
+          minutesUntilSession <= reminderMinutes &&
           !notifiedSessionsRef.current.has(sessionKey)
         ) {
           notifiedSessionsRef.current.add(sessionKey);
@@ -134,7 +152,7 @@ export function useStudyReminders() {
         notifiedSessionsRef.current.delete(key);
       }
     });
-  }, [user?.id, enabled, permission]);
+  }, [user?.id, enabled, permission, reminderMinutes]);
 
   // Set up interval to check for upcoming sessions
   useEffect(() => {
@@ -157,6 +175,8 @@ export function useStudyReminders() {
   return {
     permission,
     enabled,
+    reminderMinutes,
+    setReminderMinutes,
     enableReminders,
     disableReminders,
     requestPermission,
