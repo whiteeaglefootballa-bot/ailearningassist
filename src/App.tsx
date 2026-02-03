@@ -12,6 +12,7 @@ import Courses from "./pages/Courses";
 import Quizzes from "./pages/Quizzes";
 import Settings from "./pages/Settings";
 import StudyPlan from "./pages/StudyPlan";
+import SharedPlan from "./pages/SharedPlan";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -60,6 +61,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
+      <Route path="/shared/:token" element={<SharedPlan />} />
       <Route
         path="/auth"
         element={

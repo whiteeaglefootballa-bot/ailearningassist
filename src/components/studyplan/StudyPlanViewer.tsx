@@ -21,8 +21,12 @@ import {
   ArrowLeft,
   Sparkles,
   Download,
+  Share2,
+  FileText,
 } from 'lucide-react';
 import { downloadICSFile } from '@/lib/ics-generator';
+import { generateStudyPlanPDF } from '@/lib/pdf-generator';
+import { SharePlanDialog } from './SharePlanDialog';
 
 interface StudySession {
   time: string;
@@ -61,6 +65,7 @@ export function StudyPlanViewer({ plan, onBack }: StudyPlanViewerProps) {
   );
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   useEffect(() => {
     if (plan.id && user?.id) {
@@ -184,7 +189,7 @@ export function StudyPlanViewer({ plan, onBack }: StudyPlanViewerProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="w-5 h-5" />
@@ -194,15 +199,45 @@ export function StudyPlanViewer({ plan, onBack }: StudyPlanViewerProps) {
             <p className="text-muted-foreground">Your personalized weekly schedule</p>
           </div>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={() => downloadICSFile(plan)}
-          className="gap-2"
-        >
-          <Download className="w-4 h-4" />
-          Export to Calendar
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {plan.id && (
+            <Button 
+              variant="outline" 
+              onClick={() => setShareDialogOpen(true)}
+              className="gap-2"
+            >
+              <Share2 className="w-4 h-4" />
+              Share
+            </Button>
+          )}
+          <Button 
+            variant="outline" 
+            onClick={() => generateStudyPlanPDF(plan)}
+            className="gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            Export PDF
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => downloadICSFile(plan)}
+            className="gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Calendar
+          </Button>
+        </div>
       </div>
+
+      {/* Share Dialog */}
+      {plan.id && (
+        <SharePlanDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          planId={plan.id}
+          planTitle={plan.title}
+        />
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
