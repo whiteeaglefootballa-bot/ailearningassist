@@ -34,6 +34,7 @@ import {
   Sparkles,
   RefreshCw,
 } from 'lucide-react';
+import { GoalExpirationToggle } from './GoalExpirationToggle';
 
 interface LearningGoal {
   id: string;
@@ -280,76 +281,79 @@ export function LearningGoals() {
               <p className="text-sm text-muted-foreground">Track your daily & weekly targets</p>
             </div>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="bg-gradient-primary hover:opacity-90">
-                <Plus className="w-4 h-4 mr-1" />
-                Add Goal
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className="font-display">Create New Goal</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label>Goal Title</Label>
-                  <Input
-                    placeholder="e.g., Complete morning study session"
-                    value={newGoal.title}
-                    onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Type</Label>
-                    <Select
-                      value={newGoal.goal_type}
-                      onValueChange={(v) => setNewGoal({ ...newGoal, goal_type: v as 'daily' | 'weekly' })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Unit</Label>
-                    <Select
-                      value={newGoal.unit}
-                      onValueChange={(v) => setNewGoal({ ...newGoal, unit: v as 'sessions' | 'hours' | 'tasks' })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sessions">Sessions</SelectItem>
-                        <SelectItem value="hours">Hours</SelectItem>
-                        <SelectItem value="tasks">Tasks</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Target ({UNIT_LABELS[newGoal.unit]})</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={100}
-                    value={newGoal.target_value}
-                    onChange={(e) => setNewGoal({ ...newGoal, target_value: parseInt(e.target.value) || 1 })}
-                  />
-                </div>
-                <Button onClick={createGoal} className="w-full bg-gradient-primary hover:opacity-90">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Create Goal
+          <div className="flex items-center gap-3">
+            <GoalExpirationToggle />
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="bg-gradient-primary hover:opacity-90">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Goal
                 </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-display">Create New Goal</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>Goal Title</Label>
+                    <Input
+                      placeholder="e.g., Complete morning study session"
+                      value={newGoal.title}
+                      onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Type</Label>
+                      <Select
+                        value={newGoal.goal_type}
+                        onValueChange={(v) => setNewGoal({ ...newGoal, goal_type: v as 'daily' | 'weekly' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Unit</Label>
+                      <Select
+                        value={newGoal.unit}
+                        onValueChange={(v) => setNewGoal({ ...newGoal, unit: v as 'sessions' | 'hours' | 'tasks' })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sessions">Sessions</SelectItem>
+                          <SelectItem value="hours">Hours</SelectItem>
+                          <SelectItem value="tasks">Tasks</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Target ({UNIT_LABELS[newGoal.unit]})</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={newGoal.target_value}
+                      onChange={(e) => setNewGoal({ ...newGoal, target_value: parseInt(e.target.value) || 1 })}
+                    />
+                  </div>
+                  <Button onClick={createGoal} className="w-full bg-gradient-primary hover:opacity-90">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Create Goal
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
