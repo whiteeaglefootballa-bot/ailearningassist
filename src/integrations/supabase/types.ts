@@ -308,6 +308,44 @@ export type Database = {
           },
         ]
       }
+      shared_study_plan_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          share_token: string
+          study_plan_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          share_token?: string
+          study_plan_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          share_token?: string
+          study_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_study_plan_links_study_plan_id_fkey"
+            columns: ["study_plan_id"]
+            isOneToOne: false
+            referencedRelation: "study_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       study_plans: {
         Row: {
           available_hours_per_week: number
@@ -438,7 +476,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_shared_study_plan: { Args: { p_share_token: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
