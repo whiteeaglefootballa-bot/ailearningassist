@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRealtimeProgress } from '@/hooks/useRealtimeProgress';
 import { StrengthsWeaknesses } from '@/components/dashboard/StrengthsWeaknesses';
+import { StudyStreakWidget } from '@/components/dashboard/StudyStreakWidget';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -109,7 +110,7 @@ export default function Dashboard() {
           <Flame className="w-6 h-6" />
           <div>
             <p className="text-sm opacity-90">Study Streak</p>
-            <p className="text-xl font-bold">7 days</p>
+            <p className="text-xl font-bold">{loading ? '...' : `${stats.recentQuizzes.length > 0 ? 'Active' : 'Start today!'}`}</p>
           </div>
         </div>
       </motion.div>
@@ -252,14 +253,25 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Strengths & Weaknesses */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        <StrengthsWeaknesses topicPerformance={stats.topicPerformance} />
-      </motion.div>
+      {/* Strengths & Weaknesses and Study Streak Widget */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="lg:col-span-2"
+        >
+          <StrengthsWeaknesses topicPerformance={stats.topicPerformance} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+        >
+          <StudyStreakWidget recentQuizzes={stats.recentQuizzes} loading={loading} />
+        </motion.div>
+      </div>
 
       {/* Topics Progress */}
       <motion.div

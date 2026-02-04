@@ -2,12 +2,20 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface QuizAttemptWithTitle {
+  score: number;
+  total_questions: number;
+  completed_at: string;
+  quizTitle?: string;
+}
+
 interface ProgressStats {
   totalLessonsCompleted: number;
   totalQuizzesTaken: number;
   averageScore: number;
   totalMinutes: number;
   topicPerformance: { topic: string; score: number; attempts: number }[];
+  recentQuizzes: QuizAttemptWithTitle[];
 }
 
 export function useRealtimeProgress() {
@@ -18,6 +26,7 @@ export function useRealtimeProgress() {
     averageScore: 0,
     totalMinutes: 0,
     topicPerformance: [],
+    recentQuizzes: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -56,6 +65,16 @@ export function useRealtimeProgress() {
         attempts: data.attempts,
       }));
 
+      // Format recent quizzes sorted by date
+      const recentQuizzes: QuizAttemptWithTitle[] = quizzes
+        .sort((a: any, b: any) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
+        .map((q: any) => ({
+          score: q.score,
+          total_questions: q.total_questions,
+          completed_at: q.completed_at,
+          quizTitle: q.quizzes?.title,
+        }));
+
       setStats({
         totalLessonsCompleted: progress.filter(p => p.completed).length,
         totalQuizzesTaken: quizzes.length,
@@ -64,6 +83,7 @@ export function useRealtimeProgress() {
           : 0,
         totalMinutes: progress.reduce((acc, p) => acc + (p.time_spent_minutes || 0), 0),
         topicPerformance,
+        recentQuizzes,
       });
       setLoading(false);
     };
