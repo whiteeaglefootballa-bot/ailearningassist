@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRealtimeProgress } from '@/hooks/useRealtimeProgress';
 import { StrengthsWeaknesses } from '@/components/dashboard/StrengthsWeaknesses';
 import { StudyStreakWidget } from '@/components/dashboard/StudyStreakWidget';
+import { ActivityHeatmap } from '@/components/dashboard/ActivityHeatmap';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -273,11 +274,20 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Topics Progress */}
+      {/* Activity Heatmap */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
+      >
+        <ActivityHeatmap />
+      </motion.div>
+
+      {/* Topics Progress */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.55 }}
       >
         <Card className="border-0 shadow-lg">
           <CardHeader>
