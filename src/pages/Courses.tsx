@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { useCourses } from '@/hooks/useCourses';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   BookOpen,
   Clock,
@@ -23,17 +24,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  difficulty: string;
-  total_lessons: number;
-  image_url?: string;
-  progress?: number;
-}
-
 const categoryIcons: Record<string, typeof Code> = {
   Programming: Code,
   Design: Palette,
@@ -48,82 +38,51 @@ const difficultyColors: Record<string, string> = {
   advanced: 'bg-destructive/10 text-destructive',
 };
 
-// Sample courses for demo
-const sampleCourses: Course[] = [
-  {
-    id: '1',
-    title: 'JavaScript Fundamentals',
-    description: 'Master the core concepts of JavaScript programming, from variables to async/await.',
-    category: 'Programming',
-    difficulty: 'beginner',
-    total_lessons: 12,
-    progress: 75,
-  },
-  {
-    id: '2',
-    title: 'React Hooks Deep Dive',
-    description: 'Learn advanced React patterns with hooks including useState, useEffect, and custom hooks.',
-    category: 'Programming',
-    difficulty: 'intermediate',
-    total_lessons: 8,
-    progress: 45,
-  },
-  {
-    id: '3',
-    title: 'TypeScript Mastery',
-    description: 'From basic types to advanced generics, become a TypeScript expert.',
-    category: 'Programming',
-    difficulty: 'intermediate',
-    total_lessons: 15,
-    progress: 30,
-  },
-  {
-    id: '4',
-    title: 'UI/UX Design Principles',
-    description: 'Learn the fundamentals of creating beautiful and user-friendly interfaces.',
-    category: 'Design',
-    difficulty: 'beginner',
-    total_lessons: 10,
-    progress: 0,
-  },
-  {
-    id: '5',
-    title: 'Calculus Made Easy',
-    description: 'Understand derivatives, integrals, and their applications in real-world problems.',
-    category: 'Mathematics',
-    difficulty: 'intermediate',
-    total_lessons: 20,
-    progress: 15,
-  },
-  {
-    id: '6',
-    title: 'Spanish for Beginners',
-    description: 'Start your journey to fluency with essential Spanish vocabulary and grammar.',
-    category: 'Languages',
-    difficulty: 'beginner',
-    total_lessons: 25,
-    progress: 0,
-  },
-];
-
-const categories = ['All', 'Programming', 'Design', 'Mathematics', 'Languages', 'Science'];
-
 export default function Courses() {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState<Course[]>(sampleCourses);
+  const { courses, loading } = useCourses();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [loading, setLoading] = useState(false);
+
+  // Get unique categories from courses
+  const categories = ['All', ...new Set(courses.map(c => c.category).filter(Boolean))];
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (course.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   const inProgressCourses = filteredCourses.filter(c => c.progress && c.progress > 0);
   const newCourses = filteredCourses.filter(c => !c.progress || c.progress === 0);
+
+  if (loading) {
+    return (
+      <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="border-0 shadow-md">
+              <CardHeader>
+                <Skeleton className="h-10 w-10 rounded-xl mb-2" />
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-full mt-2" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
@@ -189,15 +148,15 @@ export default function Courses() {
                         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                           <CategoryIcon className="w-5 h-5 text-primary" />
                         </div>
-                        <Badge className={cn("text-xs", difficultyColors[course.difficulty])}>
-                          {course.difficulty}
+                        <Badge className={cn("text-xs", difficultyColors[course.difficulty || 'beginner'])}>
+                          {course.difficulty || 'beginner'}
                         </Badge>
                       </div>
                       <CardTitle className="text-lg group-hover:text-primary transition-colors">
                         {course.title}
                       </CardTitle>
                       <CardDescription className="line-clamp-2">
-                        {course.description}
+                        {course.description || 'No description available'}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -205,7 +164,7 @@ export default function Courses() {
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground flex items-center gap-1">
                             <BookOpen className="w-4 h-4" />
-                            {course.total_lessons} lessons
+                            {course.total_lessons || 0} lessons
                           </span>
                           <span className="font-medium text-primary">{course.progress}%</span>
                         </div>
@@ -246,22 +205,22 @@ export default function Courses() {
                       <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
                         <CategoryIcon className="w-5 h-5 text-accent" />
                       </div>
-                      <Badge className={cn("text-xs", difficultyColors[course.difficulty])}>
-                        {course.difficulty}
+                      <Badge className={cn("text-xs", difficultyColors[course.difficulty || 'beginner'])}>
+                        {course.difficulty || 'beginner'}
                       </Badge>
                     </div>
                     <CardTitle className="text-lg group-hover:text-primary transition-colors">
                       {course.title}
                     </CardTitle>
                     <CardDescription className="line-clamp-2">
-                      {course.description}
+                      {course.description || 'No description available'}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground flex items-center gap-1">
                         <BookOpen className="w-4 h-4" />
-                        {course.total_lessons} lessons
+                        {course.total_lessons || 0} lessons
                       </span>
                       <Button size="sm" variant="ghost" className="group-hover:text-primary">
                         Start <ChevronRight className="w-4 h-4 ml-1" />

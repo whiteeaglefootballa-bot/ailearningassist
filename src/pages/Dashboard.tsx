@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRealtimeProgress } from '@/hooks/useRealtimeProgress';
+import { useWeeklyProgress } from '@/hooks/useWeeklyProgress';
+import { useTopicsProgress } from '@/hooks/useTopicsProgress';
 import { StrengthsWeaknesses } from '@/components/dashboard/StrengthsWeaknesses';
 import { StudyStreakWidget } from '@/components/dashboard/StudyStreakWidget';
 import { ActivityHeatmap } from '@/components/dashboard/ActivityHeatmap';
@@ -29,26 +31,12 @@ import {
   Area,
 } from 'recharts';
 
-const weeklyData = [
-  { day: 'Mon', minutes: 45, score: 72 },
-  { day: 'Tue', minutes: 60, score: 78 },
-  { day: 'Wed', minutes: 30, score: 65 },
-  { day: 'Thu', minutes: 90, score: 85 },
-  { day: 'Fri', minutes: 45, score: 70 },
-  { day: 'Sat', minutes: 120, score: 92 },
-  { day: 'Sun', minutes: 60, score: 80 },
-];
-
-const recentTopics = [
-  { name: 'JavaScript Fundamentals', progress: 75, color: 'bg-chart-1' },
-  { name: 'React Hooks', progress: 45, color: 'bg-chart-2' },
-  { name: 'TypeScript Basics', progress: 30, color: 'bg-chart-3' },
-];
-
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { stats, loading } = useRealtimeProgress();
+  const { weeklyData, loading: weeklyLoading } = useWeeklyProgress();
+  const { topics: recentTopics, loading: topicsLoading } = useTopicsProgress();
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
@@ -166,14 +154,19 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
-                  {stats.totalMinutes} mins total
+                  {weeklyLoading ? '...' : `${weeklyData.reduce((sum, d) => sum + d.minutes, 0)} mins this week`}
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weeklyData}>
+                {weeklyLoading ? (
+                  <div className="h-full flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={weeklyData}>
                     <defs>
                       <linearGradient id="colorMinutes" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
@@ -198,8 +191,9 @@ export default function Dashboard() {
                       fillOpacity={1}
                       fill="url(#colorMinutes)"
                     />
-                  </AreaChart>
-                </ResponsiveContainer>
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -303,7 +297,17 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
-              {recentTopics.map((topic, index) => (
+              {topicsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : recentTopics.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">Start a course to track your progress</p>
+                </div>
+              ) : (
+                recentTopics.map((topic, index) => (
                 <motion.div
                   key={topic.name}
                   initial={{ opacity: 0, x: -20 }}
@@ -324,7 +328,8 @@ export default function Dashboard() {
                     />
                   </div>
                 </motion.div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

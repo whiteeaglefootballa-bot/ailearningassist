@@ -6,8 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { QuizImprovementSuggestions } from '@/components/quiz/QuizImprovementSuggestions';
 import { useToast } from '@/hooks/use-toast';
+import { useQuizzes, useQuizQuestions, useQuizStats, Quiz } from '@/hooks/useQuizzes';
 import {
   Trophy,
   Clock,
@@ -19,95 +21,36 @@ import {
   Target,
   Brain,
   Zap,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface QuizQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation: string;
-}
-
-interface Quiz {
-  id: string;
-  title: string;
-  category: string;
-  difficulty: string;
-  questionCount: number;
-  timeLimit: number;
-  bestScore?: number;
-}
-
-const sampleQuizzes: Quiz[] = [
-  { id: '1', title: 'JavaScript Basics', category: 'Programming', difficulty: 'beginner', questionCount: 10, timeLimit: 10, bestScore: 80 },
-  { id: '2', title: 'React Fundamentals', category: 'Programming', difficulty: 'intermediate', questionCount: 15, timeLimit: 15, bestScore: 67 },
-  { id: '3', title: 'TypeScript Types', category: 'Programming', difficulty: 'intermediate', questionCount: 12, timeLimit: 12 },
-  { id: '4', title: 'CSS Layouts', category: 'Design', difficulty: 'beginner', questionCount: 8, timeLimit: 8, bestScore: 100 },
-  { id: '5', title: 'Algebra Essentials', category: 'Mathematics', difficulty: 'beginner', questionCount: 10, timeLimit: 15 },
-];
-
-const sampleQuestions: QuizQuestion[] = [
-  {
-    id: '1',
-    question: 'What is the output of typeof null in JavaScript?',
-    options: ['null', 'undefined', 'object', 'boolean'],
-    correctAnswer: 2,
-    explanation: 'This is a well-known JavaScript quirk. typeof null returns "object" due to a bug in the original JavaScript implementation.',
-  },
-  {
-    id: '2',
-    question: 'Which method is used to add an element to the end of an array?',
-    options: ['push()', 'pop()', 'shift()', 'unshift()'],
-    correctAnswer: 0,
-    explanation: 'The push() method adds one or more elements to the end of an array and returns the new length.',
-  },
-  {
-    id: '3',
-    question: 'What does "===" operator check in JavaScript?',
-    options: ['Only value', 'Only type', 'Value and type', 'Reference'],
-    correctAnswer: 2,
-    explanation: 'The strict equality operator (===) checks both the value and the type, without type coercion.',
-  },
-  {
-    id: '4',
-    question: 'Which is NOT a JavaScript data type?',
-    options: ['undefined', 'boolean', 'float', 'symbol'],
-    correctAnswer: 2,
-    explanation: 'JavaScript has number type which handles both integers and floating-point numbers. There is no separate "float" type.',
-  },
-  {
-    id: '5',
-    question: 'What is the purpose of the "let" keyword?',
-    options: ['Declare a constant', 'Declare a block-scoped variable', 'Declare a global variable', 'Declare a function'],
-    correctAnswer: 1,
-    explanation: 'The "let" keyword declares a block-scoped variable that can be reassigned, unlike "const" which cannot.',
-  },
-];
 
 const difficultyColors: Record<string, string> = {
   beginner: 'bg-success/10 text-success',
   intermediate: 'bg-warning/10 text-warning',
+  medium: 'bg-warning/10 text-warning',
   advanced: 'bg-destructive/10 text-destructive',
 };
 
 export default function Quizzes() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { quizzes, loading: quizzesLoading } = useQuizzes();
+  const { stats, loading: statsLoading } = useQuizStats();
   const [activeQuiz, setActiveQuiz] = useState<Quiz | null>(null);
+  const { questions, loading: questionsLoading } = useQuizQuestions(activeQuiz?.id || null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState<number[]>([]);
   const [quizCompleted, setQuizCompleted] = useState(false);
 
-  const currentQuestion = sampleQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
   const isCorrect = selectedAnswer === currentQuestion?.correctAnswer;
   const score = answers.reduce((acc, ans, idx) => 
-    acc + (ans === sampleQuestions[idx]?.correctAnswer ? 1 : 0), 0
+    acc + (ans === questions[idx]?.correctAnswer ? 1 : 0), 0
   );
-  const scorePercentage = Math.round((score / sampleQuestions.length) * 100);
+  const scorePercentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
 
   const startQuiz = (quiz: Quiz) => {
     setActiveQuiz(quiz);
@@ -130,7 +73,7 @@ export default function Quizzes() {
   };
 
   const handleNextQuestion = async () => {
-    if (currentQuestionIndex < sampleQuestions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswer(null);
       setShowResult(false);
@@ -139,9 +82,9 @@ export default function Quizzes() {
       if (user?.id && activeQuiz) {
         await supabase.from('quiz_attempts').insert({
           user_id: user.id,
-          quiz_id: activeQuiz.id.length > 10 ? activeQuiz.id : 'aaaa1111-1111-1111-1111-111111111111',
+          quiz_id: activeQuiz.id,
           score: score + (selectedAnswer === currentQuestion?.correctAnswer ? 1 : 0),
-          total_questions: sampleQuestions.length,
+          total_questions: questions.length,
           answers: answers,
         });
       }
@@ -158,7 +101,36 @@ export default function Quizzes() {
     setQuizCompleted(false);
   };
 
-  if (activeQuiz && !quizCompleted) {
+  // Loading state when starting a quiz
+  if (activeQuiz && !quizCompleted && questionsLoading) {
+    return (
+      <div className="p-4 md:p-6 lg:p-8 max-w-3xl mx-auto flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading quiz questions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No questions available
+  if (activeQuiz && !quizCompleted && questions.length === 0 && !questionsLoading) {
+    return (
+      <div className="p-4 md:p-6 lg:p-8 max-w-3xl mx-auto">
+        <Card className="border-0 shadow-xl text-center py-12">
+          <CardContent>
+            <Brain className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-display font-bold mb-2">No Questions Available</h2>
+            <p className="text-muted-foreground mb-6">This quiz doesn't have any questions yet.</p>
+            <Button onClick={resetQuiz}>Back to Quizzes</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Active quiz with questions
+  if (activeQuiz && !quizCompleted && questions.length > 0) {
     return (
       <div className="p-4 md:p-6 lg:p-8 max-w-3xl mx-auto">
         <div className="mb-6">
@@ -169,9 +141,9 @@ export default function Quizzes() {
             </Button>
           </div>
           <div className="flex items-center gap-4">
-            <Progress value={((currentQuestionIndex + 1) / sampleQuestions.length) * 100} className="flex-1 h-2" />
+            <Progress value={((currentQuestionIndex + 1) / questions.length) * 100} className="flex-1 h-2" />
             <span className="text-sm text-muted-foreground">
-              {currentQuestionIndex + 1}/{sampleQuestions.length}
+              {currentQuestionIndex + 1}/{questions.length}
             </span>
           </div>
         </div>
@@ -239,7 +211,7 @@ export default function Quizzes() {
                       <span className="font-semibold">
                         {isCorrect ? '🎉 Correct!' : '📚 Explanation:'}
                       </span>{' '}
-                      {currentQuestion.explanation}
+                      {currentQuestion.explanation || 'Great job!'}
                     </p>
                   </motion.div>
                 )}
@@ -255,7 +227,7 @@ export default function Quizzes() {
                     </Button>
                   ) : (
                     <Button onClick={handleNextQuestion} className="bg-gradient-primary hover:opacity-90">
-                      {currentQuestionIndex < sampleQuestions.length - 1 ? 'Next Question' : 'See Results'}
+                      {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'See Results'}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   )}
@@ -296,7 +268,7 @@ export default function Quizzes() {
                 {scorePercentage >= 80 ? 'Excellent!' : scorePercentage >= 50 ? 'Good Job!' : 'Keep Practicing!'}
               </h2>
               <p className="text-muted-foreground mb-6">
-                You scored {score} out of {sampleQuestions.length} questions
+                You scored {score} out of {questions.length} questions
               </p>
               
               <div className="text-5xl font-display font-bold mb-6 text-gradient-primary">
@@ -319,7 +291,7 @@ export default function Quizzes() {
         {/* Improvement Suggestions */}
         <QuizImprovementSuggestions
           score={score}
-          totalQuestions={sampleQuestions.length}
+          totalQuestions={questions.length}
           category={activeQuiz.category}
         />
       </div>
@@ -335,12 +307,17 @@ export default function Quizzes() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { icon: Target, label: 'Quizzes Taken', value: '12', color: 'from-chart-1 to-blue-600' },
-          { icon: Trophy, label: 'Best Score', value: '100%', color: 'from-chart-3 to-green-600' },
-          { icon: Brain, label: 'Avg Score', value: '78%', color: 'from-chart-2 to-teal-600' },
-          { icon: Zap, label: 'Current Streak', value: '5', color: 'from-chart-4 to-orange-600' },
-        ].map((stat, index) => (
+        {(statsLoading ? [
+          { icon: Target, label: 'Quizzes Taken', value: '...', color: 'from-chart-1 to-blue-600' },
+          { icon: Trophy, label: 'Best Score', value: '...', color: 'from-chart-3 to-green-600' },
+          { icon: Brain, label: 'Avg Score', value: '...', color: 'from-chart-2 to-teal-600' },
+          { icon: Zap, label: 'Current Streak', value: '...', color: 'from-chart-4 to-orange-600' },
+        ] : [
+          { icon: Target, label: 'Quizzes Taken', value: String(stats.totalQuizzesTaken), color: 'from-chart-1 to-blue-600' },
+          { icon: Trophy, label: 'Best Score', value: stats.bestScore > 0 ? `${stats.bestScore}%` : '-', color: 'from-chart-3 to-green-600' },
+          { icon: Brain, label: 'Avg Score', value: stats.avgScore > 0 ? `${stats.avgScore}%` : '-', color: 'from-chart-2 to-teal-600' },
+          { icon: Zap, label: 'Current Streak', value: String(stats.currentStreak), color: 'from-chart-4 to-orange-600' },
+        ]).map((stat, index) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
@@ -370,8 +347,32 @@ export default function Quizzes() {
           <Sparkles className="w-5 h-5 text-primary" />
           Available Quizzes
         </h2>
+        {quizzesLoading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Card key={i} className="border-0 shadow-md">
+                <CardHeader>
+                  <Skeleton className="h-5 w-20 mb-2" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-10 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : quizzes.length === 0 ? (
+          <Card className="border-0 shadow-md text-center py-12">
+            <CardContent>
+              <Brain className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium mb-2">No Quizzes Available</h3>
+              <p className="text-muted-foreground">Check back later for new quizzes!</p>
+            </CardContent>
+          </Card>
+        ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sampleQuizzes.map((quiz, index) => (
+          {quizzes.map((quiz, index) => (
             <motion.div
               key={quiz.id}
               initial={{ opacity: 0, y: 20 }}
@@ -382,7 +383,7 @@ export default function Quizzes() {
                 onClick={() => startQuiz(quiz)}>
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
-                    <Badge className={cn("text-xs", difficultyColors[quiz.difficulty])}>
+                    <Badge className={cn("text-xs", difficultyColors[quiz.difficulty] || difficultyColors.medium)}>
                       {quiz.difficulty}
                     </Badge>
                     {quiz.bestScore && (
@@ -418,6 +419,7 @@ export default function Quizzes() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
