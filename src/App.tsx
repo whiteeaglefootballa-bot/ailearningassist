@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AITutor from "./pages/AITutor";
 import Courses from "./pages/Courses";
+import CourseDetail from "./pages/CourseDetail";
 import Quizzes from "./pages/Quizzes";
 import Settings from "./pages/Settings";
 import StudyPlan from "./pages/StudyPlan";
@@ -81,6 +82,7 @@ function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="tutor" element={<AITutor />} />
         <Route path="courses" element={<Courses />} />
+        <Route path="courses/:id" element={<CourseDetail />} />
         <Route path="quizzes" element={<Quizzes />} />
         <Route path="study-plan" element={<StudyPlan />} />
         <Route path="settings" element={<Settings />} />
