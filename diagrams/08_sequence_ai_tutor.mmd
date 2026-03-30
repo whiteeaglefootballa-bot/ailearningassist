@@ -1,0 +1,27 @@
+sequenceDiagram
+    actor User
+    participant Chat as AI Tutor Page
+    participant SDK as Supabase SDK
+    participant DB as PostgreSQL
+    participant EdgeFn as Edge Function<br/>ai-tutor
+    participant LLM as LLM API
+
+    User->>Chat: Type message
+    User->>Chat: Send message
+    Chat->>SDK: from('chat_messages').insert({role:'user', content})
+    SDK->>DB: INSERT user message
+    DB-->>SDK: Stored
+    Chat->>Chat: Display user message
+
+    Chat->>SDK: functions.invoke('ai-tutor', {message, context})
+    SDK->>EdgeFn: POST /ai-tutor
+    EdgeFn->>EdgeFn: Build prompt with context
+    EdgeFn->>LLM: Send prompt
+    LLM-->>EdgeFn: AI response text
+    EdgeFn-->>SDK: {response: "AI answer"}
+    SDK-->>Chat: AI response received
+
+    Chat->>SDK: from('chat_messages').insert({role:'assistant', content})
+    SDK->>DB: INSERT assistant message
+    DB-->>SDK: Stored
+    Chat-->>User: Display AI response

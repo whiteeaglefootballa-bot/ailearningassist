@@ -1,0 +1,157 @@
+erDiagram
+    USERS ||--o{ PROFILES : has
+    USERS ||--o{ USER_PROGRESS : tracks
+    USERS ||--o{ QUIZ_ATTEMPTS : takes
+    USERS ||--o{ CHAT_MESSAGES : sends
+    USERS ||--o{ STUDY_PLANS : creates
+    USERS ||--o{ LEARNING_GOALS : sets
+    USERS ||--o{ STUDY_SESSION_COMPLETIONS : completes
+
+    COURSES ||--o{ LESSONS : contains
+    COURSES ||--o{ QUIZZES : has
+    COURSES ||--o{ USER_PROGRESS : tracked_in
+
+    LESSONS ||--o{ USER_PROGRESS : tracked_in
+    LESSONS ||--o{ QUIZZES : assessed_by
+
+    QUIZZES ||--o{ QUIZ_QUESTIONS : contains
+    QUIZZES ||--o{ QUIZ_ATTEMPTS : attempted_in
+
+    STUDY_PLANS ||--o{ STUDY_SESSION_COMPLETIONS : tracked_by
+    STUDY_PLANS ||--o{ SHARED_STUDY_PLAN_LINKS : shared_via
+
+    USERS {
+        uuid id PK
+        string email
+        string encrypted_password
+        timestamp created_at
+    }
+
+    PROFILES {
+        uuid id PK
+        uuid user_id FK
+        string full_name
+        string avatar_url
+        string learning_level
+        string[] preferred_subjects
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    COURSES {
+        uuid id PK
+        string title
+        string description
+        string category
+        string difficulty
+        string image_url
+        int total_lessons
+        timestamp created_at
+    }
+
+    LESSONS {
+        uuid id PK
+        uuid course_id FK
+        string title
+        text content
+        int order_index
+        int duration_minutes
+        timestamp created_at
+    }
+
+    QUIZZES {
+        uuid id PK
+        uuid course_id FK
+        uuid lesson_id FK
+        string title
+        string difficulty
+        timestamp created_at
+    }
+
+    QUIZ_QUESTIONS {
+        uuid id PK
+        uuid quiz_id FK
+        string question
+        json options
+        int correct_answer
+        string explanation
+        int order_index
+    }
+
+    QUIZ_ATTEMPTS {
+        uuid id PK
+        uuid user_id FK
+        uuid quiz_id FK
+        int score
+        int total_questions
+        json answers
+        timestamp completed_at
+    }
+
+    USER_PROGRESS {
+        uuid id PK
+        uuid user_id FK
+        uuid course_id FK
+        uuid lesson_id FK
+        boolean completed
+        timestamp completed_at
+        int score
+        int time_spent_minutes
+        timestamp created_at
+    }
+
+    CHAT_MESSAGES {
+        uuid id PK
+        uuid user_id FK
+        string conversation_id
+        string role
+        text content
+        json context
+        timestamp created_at
+    }
+
+    STUDY_PLANS {
+        uuid id PK
+        uuid user_id FK
+        string title
+        string[] goals
+        json schedule
+        int available_hours_per_week
+        string[] preferred_days
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    STUDY_SESSION_COMPLETIONS {
+        uuid id PK
+        uuid user_id FK
+        uuid study_plan_id FK
+        string day
+        int session_index
+        timestamp completed_at
+    }
+
+    SHARED_STUDY_PLAN_LINKS {
+        uuid id PK
+        uuid study_plan_id FK
+        uuid created_by FK
+        string share_token
+        boolean is_active
+        timestamp expires_at
+        timestamp created_at
+    }
+
+    LEARNING_GOALS {
+        uuid id PK
+        uuid user_id FK
+        string title
+        string goal_type
+        int target_value
+        int current_value
+        string unit
+        boolean is_active
+        string period_start
+        timestamp created_at
+        timestamp updated_at
+    }

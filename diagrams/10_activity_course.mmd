@@ -1,0 +1,21 @@
+flowchart TD
+    A([Start]) --> B[Navigate to Courses Page]
+    B --> C[System fetches courses from DB]
+    C --> D[Display course cards with details]
+    D --> E[User selects a course]
+    E --> F[System loads course detail + lessons]
+    F --> G[Display lessons list with progress]
+    G --> H[User clicks on a lesson]
+    H --> I[Display lesson content]
+    I --> J{Mark as complete?}
+    J -->|Yes| K[User toggles completion]
+    K --> L[System upserts user_progress]
+    L --> M[Update progress percentage]
+    M --> N[Update UI with new status]
+    J -->|No| O{Read next lesson?}
+    N --> O
+    O -->|Yes| P[Navigate to next lesson]
+    P --> I
+    O -->|No| Q{Back to courses?}
+    Q -->|Yes| D
+    Q -->|No| R([End])

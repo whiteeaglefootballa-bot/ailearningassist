@@ -1,0 +1,10 @@
+graph LR
+    Student(("Student"))
+    AIService(("AI Service<br/>LLM"))
+    
+    System["AI Learning<br/>Assistant<br/>System"]
+
+    Student -->|"Login Credentials<br/>Quiz Answers<br/>Chat Messages<br/>Study Preferences"| System
+    System -->|"Course Content<br/>Quiz Scores<br/>AI Responses<br/>Study Plans<br/>Analytics"| Student
+    System -->|"Tutor Prompts<br/>Plan Generation<br/>Requests"| AIService
+    AIService -->|"AI Responses<br/>Generated Plans"| System

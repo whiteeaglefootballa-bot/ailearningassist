@@ -1,0 +1,40 @@
+graph LR
+    Guest(("Guest"))
+    Student(("Student"))
+    SharedUser(("Shared<br/>User"))
+
+    subgraph System["AI Learning Assistant"]
+        UC01["UC-01<br/>Register Account"]
+        UC02["UC-02<br/>Login"]
+        UC03["UC-03<br/>Browse Courses"]
+        UC04["UC-04<br/>View Lessons"]
+        UC05["UC-05<br/>Mark Lesson Complete"]
+        UC06["UC-06<br/>Take Quiz"]
+        UC07["UC-07<br/>View Quiz Results"]
+        UC08["UC-08<br/>Chat with AI Tutor"]
+        UC09["UC-09<br/>Generate Study Plan"]
+        UC10["UC-10<br/>Share Study Plan"]
+        UC11["UC-11<br/>Export Plan as PDF"]
+        UC12["UC-12<br/>View Dashboard"]
+        UC13["UC-13<br/>Update Profile"]
+        UC14["UC-14<br/>View Shared Plan"]
+        UC15["UC-15<br/>Set Learning Goals"]
+        UC16["UC-16<br/>Logout"]
+    end
+
+    Guest --> UC01
+    Guest --> UC02
+    Student --> UC03
+    Student --> UC04
+    Student --> UC05
+    Student --> UC06
+    Student --> UC07
+    Student --> UC08
+    Student --> UC09
+    Student --> UC10
+    Student --> UC11
+    Student --> UC12
+    Student --> UC13
+    Student --> UC15
+    Student --> UC16
+    SharedUser --> UC14

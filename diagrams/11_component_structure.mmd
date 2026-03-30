@@ -1,0 +1,45 @@
+graph TD
+    App["App.tsx"]
+    App --> QCP["QueryClientProvider"]
+    App --> TTP["TooltipProvider"]
+    App --> Toaster["Toaster Components"]
+    
+    QCP --> BR["BrowserRouter"]
+    BR --> AP["AuthProvider"]
+    AP --> Routes["AppRoutes"]
+    
+    Routes --> Index["Index<br/>Landing Page"]
+    Routes --> AuthPage["Auth<br/>Login/Signup"]
+    Routes --> SharedPlan["SharedPlan<br/>Public View"]
+    Routes --> NotFound["NotFound<br/>404 Page"]
+    Routes --> Protected["ProtectedRoute"]
+    
+    Protected --> DashLayout["DashboardLayout"]
+    DashLayout --> Sidebar["Sidebar Navigation"]
+    DashLayout --> GlobalSearch["GlobalSearch"]
+    
+    DashLayout --> Dashboard["Dashboard"]
+    Dashboard --> Streak["StudyStreakWidget"]
+    Dashboard --> Heatmap["ActivityHeatmap"]
+    Dashboard --> Strengths["StrengthsWeaknesses"]
+    
+    DashLayout --> Courses["Courses"]
+    Courses --> CourseDetail["CourseDetail"]
+    
+    DashLayout --> Quizzes["Quizzes"]
+    Quizzes --> QuizSuggestions["QuizImprovementSuggestions"]
+    
+    DashLayout --> AITutor["AITutor"]
+    
+    DashLayout --> StudyPlan["StudyPlan"]
+    StudyPlan --> Generator["StudyPlanGenerator"]
+    StudyPlan --> Viewer["StudyPlanViewer"]
+    StudyPlan --> ShareDialog["SharePlanDialog"]
+    StudyPlan --> Goals["LearningGoals"]
+    StudyPlan --> Weekly["WeeklySummary"]
+    StudyPlan --> Achievements["StudyAchievements"]
+    StudyPlan --> Reminders["StudyReminderToggle"]
+    StudyPlan --> GoalExpiry["GoalExpirationToggle"]
+    
+    DashLayout --> Settings["Settings"]
+    Settings --> LearningPrefs["LearningPreferences"]
