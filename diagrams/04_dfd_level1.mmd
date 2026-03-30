@@ -1,0 +1,48 @@
+graph TB
+    Student(("Student"))
+    AIService(("AI Service"))
+    
+    subgraph System["AI Learning Assistant"]
+        P1["P1<br/>Authenticate<br/>User"]
+        P2["P2<br/>Manage<br/>Courses"]
+        P3["P3<br/>Process<br/>Quizzes"]
+        P4["P4<br/>AI<br/>Tutoring"]
+        P5["P5<br/>Generate<br/>Study Plan"]
+        P6["P6<br/>Dashboard<br/>Analytics"]
+    end
+
+    DB1[("Users &<br/>Profiles DB")]
+    DB2[("Courses &<br/>Lessons DB")]
+    DB3[("Quizzes &<br/>Attempts DB")]
+    DB4[("Chat<br/>Messages DB")]
+    DB5[("Study<br/>Plans DB")]
+    DB6[("Progress<br/>DB")]
+
+    Student -->|"Credentials"| P1
+    P1 -->|"Session Token"| Student
+    P1 -->|"User Data"| DB1
+
+    Student -->|"Browse Request"| P2
+    P2 -->|"Course Content"| Student
+    P2 <-->|"Courses/Lessons"| DB2
+    P2 -->|"Completion"| DB6
+
+    Student -->|"Quiz Answers"| P3
+    P3 -->|"Score & Results"| Student
+    P3 <-->|"Questions"| DB3
+
+    Student -->|"Chat Message"| P4
+    P4 -->|"AI Response"| Student
+    P4 -->|"Prompt"| AIService
+    AIService -->|"Response"| P4
+    P4 <-->|"History"| DB4
+
+    Student -->|"Goals & Preferences"| P5
+    P5 -->|"Study Schedule"| Student
+    P5 -->|"Plan Request"| AIService
+    AIService -->|"Generated Plan"| P5
+    P5 <-->|"Plans"| DB5
+
+    P6 -->|"Analytics & Streaks"| Student
+    P6 <-->|"Progress Data"| DB6
+    P6 <-->|"Quiz Data"| DB3

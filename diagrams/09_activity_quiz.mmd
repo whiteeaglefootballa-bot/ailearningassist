@@ -1,0 +1,25 @@
+flowchart TD
+    A([Start]) --> B[Navigate to Quizzes Page]
+    B --> C[System fetches quizzes from DB]
+    C --> D{Quizzes available?}
+    D -->|No| E[Display empty state message]
+    D -->|Yes| F[Display quiz cards]
+    F --> G[User selects a quiz]
+    G --> H[System loads quiz questions]
+    H --> I[Display first question]
+    I --> J[User selects an answer]
+    J --> K{More questions?}
+    K -->|Yes| L[Display next question]
+    L --> J
+    K -->|No| M[User clicks Submit]
+    M --> N[System calculates score]
+    N --> O[Score = correct answers / total x 100]
+    O --> P[System stores attempt in quiz_attempts]
+    P --> Q[Display score and results]
+    Q --> R{View explanations?}
+    R -->|Yes| S[Show correct answers with explanations]
+    R -->|No| T{Take another quiz?}
+    S --> T
+    T -->|Yes| F
+    T -->|No| U([End])
+    E --> U

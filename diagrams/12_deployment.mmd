@@ -1,0 +1,43 @@
+graph TB
+    subgraph UserDevice["User Device"]
+        Browser["Web Browser<br/>Chrome / Firefox / Safari / Edge"]
+    end
+
+    subgraph CDN["CDN - Lovable Hosting"]
+        Static["Static Assets<br/>HTML, JS, CSS, Images<br/>Built with Vite"]
+    end
+
+    subgraph SupabaseCloud["Supabase Cloud Infrastructure"]
+        AuthSvc["Auth Service<br/>JWT Authentication<br/>Email/Password"]
+        PostgREST["PostgREST<br/>Auto-generated REST API<br/>from PostgreSQL schema"]
+        RealtimeEng["Realtime Engine<br/>WebSocket Server<br/>postgres_changes"]
+        EdgeRuntime["Edge Functions Runtime<br/>Deno Deploy"]
+        
+        subgraph EdgeFunctions["Edge Functions"]
+            AiTutor["ai-tutor<br/>Chat with LLM"]
+            GenPlan["generate-study-plan<br/>AI Study Plan"]
+        end
+        
+        subgraph Database["PostgreSQL Database"]
+            Tables["12 Tables<br/>with RLS Policies"]
+            Functions["Database Functions<br/>get_shared_study_plan"]
+        end
+        
+        EdgeRuntime --> EdgeFunctions
+        AuthSvc --> Database
+        PostgREST --> Database
+        RealtimeEng --> Database
+        EdgeFunctions --> Database
+    end
+
+    subgraph External["External Services"]
+        LLM["LLM API<br/>AI Language Model"]
+    end
+
+    Browser -->|"HTTPS GET"| CDN
+    CDN -->|"Static Files"| Browser
+    Browser -->|"HTTPS REST"| PostgREST
+    Browser -->|"HTTPS Auth"| AuthSvc
+    Browser -->|"WSS"| RealtimeEng
+    Browser -->|"HTTPS Invoke"| EdgeRuntime
+    EdgeFunctions -->|"API Call"| LLM

@@ -1,0 +1,37 @@
+graph TB
+    subgraph Client["Client Browser"]
+        React["React 18 SPA"]
+        Router["React Router v6"]
+        Query["TanStack Query"]
+        AuthCtx["Auth Context"]
+        SDK["Supabase JS SDK"]
+        
+        React --> Router
+        React --> Query
+        React --> AuthCtx
+        Query --> SDK
+        AuthCtx --> SDK
+    end
+
+    subgraph Supabase["Supabase Backend"]
+        Auth["Auth Service<br/>JWT Tokens"]
+        PostgREST["PostgREST API<br/>REST Endpoints"]
+        Realtime["Realtime Engine<br/>WebSocket"]
+        EdgeFn["Edge Functions<br/>Deno Runtime"]
+        DB["PostgreSQL 15+<br/>with RLS"]
+        
+        Auth --> DB
+        PostgREST --> DB
+        Realtime --> DB
+        EdgeFn --> DB
+    end
+
+    subgraph AI["AI Services"]
+        LLM["LLM API<br/>Language Model"]
+    end
+
+    SDK -->|HTTPS| Auth
+    SDK -->|REST API| PostgREST
+    SDK -->|WebSocket| Realtime
+    SDK -->|Invoke| EdgeFn
+    EdgeFn -->|API Call| LLM

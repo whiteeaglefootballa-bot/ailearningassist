@@ -1,0 +1,33 @@
+sequenceDiagram
+    actor User
+    participant QuizPage as Quizzes Page
+    participant Hook as useQuizzes Hook
+    participant SDK as Supabase SDK
+    participant DB as PostgreSQL
+
+    User->>QuizPage: Navigate to /dashboard/quizzes
+    QuizPage->>Hook: Fetch quizzes
+    Hook->>SDK: from('quizzes').select('*')
+    SDK->>DB: SELECT * FROM quizzes
+    DB-->>SDK: Quiz list (5 quizzes)
+    SDK-->>Hook: Quiz data
+    Hook-->>QuizPage: Display quiz cards
+    QuizPage-->>User: Show available quizzes
+
+    User->>QuizPage: Select quiz
+    QuizPage->>Hook: Fetch questions
+    Hook->>SDK: from('quiz_questions').select('*').eq('quiz_id', id)
+    SDK->>DB: SELECT * FROM quiz_questions WHERE quiz_id = ?
+    DB-->>SDK: Questions (5 per quiz)
+    SDK-->>Hook: Question data
+    Hook-->>QuizPage: Display questions
+    QuizPage-->>User: Show question with options
+
+    User->>QuizPage: Answer all questions
+    User->>QuizPage: Submit quiz
+    QuizPage->>QuizPage: Calculate score
+    QuizPage->>SDK: from('quiz_attempts').insert({score, answers})
+    SDK->>DB: INSERT INTO quiz_attempts
+    DB-->>SDK: Attempt stored
+    SDK-->>QuizPage: Success
+    QuizPage-->>User: Show score + explanations

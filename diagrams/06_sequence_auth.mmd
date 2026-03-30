@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor User
+    participant AuthPage as Auth Page
+    participant AuthCtx as Auth Context
+    participant SDK as Supabase SDK
+    participant Auth as Supabase Auth
+    participant DB as PostgreSQL
+
+    Note over User, DB: Registration Flow
+    User->>AuthPage: Enter email, password, name
+    AuthPage->>AuthCtx: signUp(email, password, name)
+    AuthCtx->>SDK: auth.signUp()
+    SDK->>Auth: POST /auth/signup
+    Auth->>DB: Insert user record
+    DB-->>Auth: User created
+    Auth-->>SDK: Confirmation email sent
+    SDK-->>AuthCtx: Success response
+    AuthCtx-->>AuthPage: Show verification message
+    AuthPage-->>User: Check your email
+
+    Note over User, DB: Login Flow
+    User->>AuthPage: Enter email, password
+    AuthPage->>AuthCtx: signIn(email, password)
+    AuthCtx->>SDK: auth.signInWithPassword()
+    SDK->>Auth: POST /auth/token
+    Auth->>DB: Validate credentials
+    DB-->>Auth: User verified
+    Auth-->>SDK: JWT Token + Session
+    SDK-->>AuthCtx: Session established
+    AuthCtx->>AuthCtx: Set user state
+    AuthCtx-->>AuthPage: Redirect to /dashboard
+    AuthPage-->>User: Dashboard loaded
