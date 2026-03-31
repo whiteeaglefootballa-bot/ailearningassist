@@ -32,6 +32,7 @@ const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/dashboard/tutor', icon: MessageSquare, label: 'AI Tutor' },
   { path: '/dashboard/courses', icon: BookOpen, label: 'Courses' },
+  { path: '/dashboard/modules', icon: Layers, label: 'Modules' },
   { path: '/dashboard/quizzes', icon: Trophy, label: 'Quizzes' },
   { path: '/dashboard/study-plan', icon: CalendarDays, label: 'Study Plan' },
 ];
