@@ -14,6 +14,8 @@ import Quizzes from "./pages/Quizzes";
 import Settings from "./pages/Settings";
 import StudyPlan from "./pages/StudyPlan";
 import SharedPlan from "./pages/SharedPlan";
+import Modules from "./pages/Modules";
+import ModuleDetail from "./pages/ModuleDetail";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -83,6 +85,8 @@ function AppRoutes() {
         <Route path="tutor" element={<AITutor />} />
         <Route path="courses" element={<Courses />} />
         <Route path="courses/:id" element={<CourseDetail />} />
+        <Route path="modules" element={<Modules />} />
+        <Route path="modules/:id" element={<ModuleDetail />} />
         <Route path="quizzes" element={<Quizzes />} />
         <Route path="study-plan" element={<StudyPlan />} />
         <Route path="settings" element={<Settings />} />

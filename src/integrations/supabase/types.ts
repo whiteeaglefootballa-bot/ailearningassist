@@ -119,6 +119,72 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_track_courses: {
+        Row: {
+          course_id: string
+          id: string
+          order_index: number | null
+          track_id: string
+        }
+        Insert: {
+          course_id: string
+          id?: string
+          order_index?: number | null
+          track_id: string
+        }
+        Update: {
+          course_id?: string
+          id?: string
+          order_index?: number | null
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_track_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_track_courses_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "learning_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_tracks: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          order_index: number | null
+          title: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          order_index?: number | null
+          title: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          order_index?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           content: string | null
