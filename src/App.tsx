@@ -14,6 +14,8 @@ import Quizzes from "./pages/Quizzes";
 import Settings from "./pages/Settings";
 import StudyPlan from "./pages/StudyPlan";
 import SharedPlan from "./pages/SharedPlan";
+import Modules from "./pages/Modules";
+import ModuleDetail from "./pages/ModuleDetail";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
