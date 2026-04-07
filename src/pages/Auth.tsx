@@ -220,7 +220,33 @@ export default function Auth() {
                 </Button>
               </form>
 
-              <div className="mt-6 text-center">
+              {isLogin && (
+                <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!email) {
+                        toast({ title: 'Enter your email', description: 'Please enter your email address first.', variant: 'destructive' });
+                        return;
+                      }
+                      try {
+                        const { error } = await (await import('@/integrations/supabase/client')).supabase.auth.resetPasswordForEmail(email, {
+                          redirectTo: `${window.location.origin}/reset-password`,
+                        });
+                        if (error) throw error;
+                        toast({ title: 'Check your email', description: 'Password reset link has been sent.' });
+                      } catch (err: any) {
+                        toast({ title: 'Error', description: err.message, variant: 'destructive' });
+                      }
+                    }}
+                    className="text-sm text-primary hover:underline transition-colors"
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-4 text-center">
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
