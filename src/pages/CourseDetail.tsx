@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { CourseMaterials } from '@/components/course/CourseMaterials';
 
 interface Course {
   id: string;
@@ -334,6 +335,9 @@ export default function CourseDetail() {
           </div>
         )}
       </div>
+
+      {/* Course Materials */}
+      <CourseMaterials courseId={id!} />
     </div>
   );
 }

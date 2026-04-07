@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { GlobalSearch } from '@/components/search/GlobalSearch';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -170,6 +171,7 @@ export default function DashboardLayout() {
         </div>
         <div className="flex items-center gap-2">
           <GlobalSearch />
+          <NotificationBell />
           <Avatar className="w-9 h-9">
             <AvatarFallback className="bg-gradient-primary text-white text-sm">
               {userInitials}
