@@ -78,7 +78,7 @@ export default function AITutor() {
   }, [user]);
 
   const handleSelectConversation = (convId: string) => {
-    setConversationId(convId);
+    setConversationId(convId as ReturnType<typeof crypto.randomUUID>);
     loadConversation(convId);
   };
 
