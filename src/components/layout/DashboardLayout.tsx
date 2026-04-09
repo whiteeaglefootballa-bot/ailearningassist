@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { GlobalSearch } from '@/components/search/GlobalSearch';
@@ -26,10 +27,13 @@ import {
   ChevronRight,
   CalendarDays,
   Layers,
+  Users,
+  PlusCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
-const navItems = [
+const studentNavItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/dashboard/tutor', icon: MessageSquare, label: 'AI Tutor' },
   { path: '/dashboard/courses', icon: BookOpen, label: 'Courses' },
@@ -38,12 +42,22 @@ const navItems = [
   { path: '/dashboard/study-plan', icon: CalendarDays, label: 'Study Plan' },
 ];
 
+const teacherNavItems = [
+  { path: '/dashboard/teacher', icon: LayoutDashboard, label: 'Teacher Panel' },
+  { path: '/dashboard/teacher/courses', icon: PlusCircle, label: 'Manage Courses' },
+  { path: '/dashboard/teacher/quizzes', icon: Trophy, label: 'Manage Quizzes' },
+  { path: '/dashboard/teacher/students', icon: Users, label: 'Student Progress' },
+];
+
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isTeacher } = useUserRole();
   const navigate = useNavigate();
   const location = useLocation();
+
+  
 
   const handleSignOut = async () => {
     await signOut();
@@ -90,8 +104,8 @@ export default function DashboardLayout() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {studentNavItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <motion.button
@@ -113,6 +127,37 @@ export default function DashboardLayout() {
               </motion.button>
             );
           })}
+
+          {isTeacher && (
+            <>
+              <Separator className="my-3 bg-sidebar-border" />
+              {sidebarOpen && (
+                <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-3 mb-1">Teacher</p>
+              )}
+              {teacherNavItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <motion.button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all",
+                      isActive
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent"
+                    )}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    {sidebarOpen && (
+                      <span className="font-medium whitespace-nowrap">{item.label}</span>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </>
+          )}
         </nav>
 
         {/* User section */}
@@ -220,16 +265,13 @@ export default function DashboardLayout() {
                 </Button>
               </div>
 
-              <nav className="flex-1 p-4 space-y-2">
-                {navItems.map((item) => {
+              <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                {studentNavItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
                     <button
                       key={item.path}
-                      onClick={() => {
-                        navigate(item.path);
-                        setMobileMenuOpen(false);
-                      }}
+                      onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
                       className={cn(
                         "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                         isActive
@@ -242,6 +284,30 @@ export default function DashboardLayout() {
                     </button>
                   );
                 })}
+                {isTeacher && (
+                  <>
+                    <Separator className="my-3 bg-sidebar-border" />
+                    <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-4 mb-1">Teacher</p>
+                    {teacherNavItems.map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <button
+                          key={item.path}
+                          onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                            isActive
+                              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent"
+                          )}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span className="font-medium">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
               </nav>
 
               <div className="p-4 border-t border-sidebar-border">

@@ -19,6 +19,10 @@ import ModuleDetail from "./pages/ModuleDetail";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import TeacherCourses from "./pages/TeacherCourses";
+import TeacherQuizzes from "./pages/TeacherQuizzes";
+import TeacherStudents from "./pages/TeacherStudents";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +96,10 @@ function AppRoutes() {
         <Route path="quizzes" element={<Quizzes />} />
         <Route path="study-plan" element={<StudyPlan />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="teacher" element={<TeacherDashboard />} />
+        <Route path="teacher/courses" element={<TeacherCourses />} />
+        <Route path="teacher/quizzes" element={<TeacherQuizzes />} />
+        <Route path="teacher/students" element={<TeacherStudents />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
