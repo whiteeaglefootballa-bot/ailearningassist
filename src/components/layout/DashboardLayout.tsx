@@ -104,8 +104,8 @@ export default function DashboardLayout() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {studentNavItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <motion.button
@@ -127,6 +127,37 @@ export default function DashboardLayout() {
               </motion.button>
             );
           })}
+
+          {isTeacher && (
+            <>
+              <Separator className="my-3 bg-sidebar-border" />
+              {sidebarOpen && (
+                <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-3 mb-1">Teacher</p>
+              )}
+              {teacherNavItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <motion.button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all",
+                      isActive
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent"
+                    )}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    {sidebarOpen && (
+                      <span className="font-medium whitespace-nowrap">{item.label}</span>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </>
+          )}
         </nav>
 
         {/* User section */}
