@@ -265,16 +265,13 @@ export default function DashboardLayout() {
                 </Button>
               </div>
 
-              <nav className="flex-1 p-4 space-y-2">
-                {navItems.map((item) => {
+              <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                {studentNavItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
                     <button
                       key={item.path}
-                      onClick={() => {
-                        navigate(item.path);
-                        setMobileMenuOpen(false);
-                      }}
+                      onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
                       className={cn(
                         "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                         isActive
@@ -287,6 +284,30 @@ export default function DashboardLayout() {
                     </button>
                   );
                 })}
+                {isTeacher && (
+                  <>
+                    <Separator className="my-3 bg-sidebar-border" />
+                    <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-4 mb-1">Teacher</p>
+                    {teacherNavItems.map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <button
+                          key={item.path}
+                          onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                            isActive
+                              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent"
+                          )}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span className="font-medium">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
               </nav>
 
               <div className="p-4 border-t border-sidebar-border">
