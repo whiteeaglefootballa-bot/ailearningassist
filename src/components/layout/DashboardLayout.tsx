@@ -57,7 +57,7 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navItems = isTeacher ? [...studentNavItems, ...teacherNavItems] : studentNavItems;
+  
 
   const handleSignOut = async () => {
     await signOut();
