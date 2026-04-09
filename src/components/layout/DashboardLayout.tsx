@@ -53,8 +53,11 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isTeacher } = useUserRole();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const navItems = isTeacher ? [...studentNavItems, ...teacherNavItems] : studentNavItems;
 
   const handleSignOut = async () => {
     await signOut();
