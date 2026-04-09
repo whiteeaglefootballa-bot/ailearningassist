@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { GlobalSearch } from '@/components/search/GlobalSearch';
@@ -26,16 +27,26 @@ import {
   ChevronRight,
   CalendarDays,
   Layers,
+  Users,
+  PlusCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
-const navItems = [
+const studentNavItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/dashboard/tutor', icon: MessageSquare, label: 'AI Tutor' },
   { path: '/dashboard/courses', icon: BookOpen, label: 'Courses' },
   { path: '/dashboard/modules', icon: Layers, label: 'Modules' },
   { path: '/dashboard/quizzes', icon: Trophy, label: 'Quizzes' },
   { path: '/dashboard/study-plan', icon: CalendarDays, label: 'Study Plan' },
+];
+
+const teacherNavItems = [
+  { path: '/dashboard/teacher', icon: LayoutDashboard, label: 'Teacher Panel' },
+  { path: '/dashboard/teacher/courses', icon: PlusCircle, label: 'Manage Courses' },
+  { path: '/dashboard/teacher/quizzes', icon: Trophy, label: 'Manage Quizzes' },
+  { path: '/dashboard/teacher/students', icon: Users, label: 'Student Progress' },
 ];
 
 export default function DashboardLayout() {
