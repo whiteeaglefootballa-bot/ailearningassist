@@ -29,6 +29,8 @@ import {
   Layers,
   Users,
   PlusCircle,
+  ShieldCheck,
+  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -47,6 +49,11 @@ const teacherNavItems = [
   { path: '/dashboard/teacher/courses', icon: PlusCircle, label: 'Manage Courses' },
   { path: '/dashboard/teacher/quizzes', icon: Trophy, label: 'Manage Quizzes' },
   { path: '/dashboard/teacher/students', icon: Users, label: 'Student Progress' },
+];
+
+const adminNavItems = [
+  { path: '/dashboard/admin/users', icon: ShieldCheck, label: 'Manage Users' },
+  { path: '/dashboard/admin/activity', icon: Activity, label: 'System Activity' },
 ];
 
 export default function DashboardLayout() {
