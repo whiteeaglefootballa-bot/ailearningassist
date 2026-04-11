@@ -23,6 +23,8 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import TeacherCourses from "./pages/TeacherCourses";
 import TeacherQuizzes from "./pages/TeacherQuizzes";
 import TeacherStudents from "./pages/TeacherStudents";
+import AdminUsers from "./pages/AdminUsers";
+import AdminActivity from "./pages/AdminActivity";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +102,8 @@ function AppRoutes() {
         <Route path="teacher/courses" element={<TeacherCourses />} />
         <Route path="teacher/quizzes" element={<TeacherQuizzes />} />
         <Route path="teacher/students" element={<TeacherStudents />} />
+        <Route path="admin/users" element={<AdminUsers />} />
+        <Route path="admin/activity" element={<AdminActivity />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
