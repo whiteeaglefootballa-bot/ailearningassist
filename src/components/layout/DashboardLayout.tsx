@@ -29,6 +29,8 @@ import {
   Layers,
   Users,
   PlusCircle,
+  ShieldCheck,
+  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -49,11 +51,16 @@ const teacherNavItems = [
   { path: '/dashboard/teacher/students', icon: Users, label: 'Student Progress' },
 ];
 
+const adminNavItems = [
+  { path: '/dashboard/admin/users', icon: ShieldCheck, label: 'Manage Users' },
+  { path: '/dashboard/admin/activity', icon: Activity, label: 'System Activity' },
+];
+
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { isTeacher } = useUserRole();
+  const { isTeacher, isAdmin } = useUserRole();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -135,6 +142,37 @@ export default function DashboardLayout() {
                 <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-3 mb-1">Teacher</p>
               )}
               {teacherNavItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <motion.button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all",
+                      isActive
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent"
+                    )}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    {sidebarOpen && (
+                      <span className="font-medium whitespace-nowrap">{item.label}</span>
+                    )}
+                  </motion.button>
+                );
+              })}
+            </>
+          )}
+
+          {isAdmin && (
+            <>
+              <Separator className="my-3 bg-sidebar-border" />
+              {sidebarOpen && (
+                <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-3 mb-1">Admin</p>
+              )}
+              {adminNavItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
                   <motion.button
@@ -289,6 +327,30 @@ export default function DashboardLayout() {
                     <Separator className="my-3 bg-sidebar-border" />
                     <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-4 mb-1">Teacher</p>
                     {teacherNavItems.map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <button
+                          key={item.path}
+                          onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                            isActive
+                              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent"
+                          )}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          <span className="font-medium">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
+                {isAdmin && (
+                  <>
+                    <Separator className="my-3 bg-sidebar-border" />
+                    <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-4 mb-1">Admin</p>
+                    {adminNavItems.map((item) => {
                       const isActive = location.pathname === item.path;
                       return (
                         <button
