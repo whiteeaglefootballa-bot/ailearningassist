@@ -53,6 +53,7 @@ const teacherNavItems = [
 
 const adminNavItems = [
   { path: '/dashboard/admin/users', icon: ShieldCheck, label: 'Manage Users' },
+  { path: '/dashboard/admin/courses', icon: BookOpen, label: 'Manage Courses' },
   { path: '/dashboard/admin/activity', icon: Activity, label: 'System Activity' },
 ];
 
