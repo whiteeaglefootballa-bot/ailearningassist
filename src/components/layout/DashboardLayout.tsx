@@ -61,7 +61,7 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { isTeacher, isAdmin } = useUserRole();
+  const { role } = useUserRole();
   const navigate = useNavigate();
   const location = useLocation();
 
