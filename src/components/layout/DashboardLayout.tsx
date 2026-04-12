@@ -33,7 +33,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
+
 
 const studentNavItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
