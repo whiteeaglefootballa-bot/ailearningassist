@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { RoleGuard } from "@/components/auth/RoleGuard";
+import { RoleRedirect } from "@/components/auth/RoleRedirect";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -90,22 +92,30 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Dashboard />} />
-        <Route path="tutor" element={<AITutor />} />
-        <Route path="courses" element={<Courses />} />
-        <Route path="courses/:id" element={<CourseDetail />} />
-        <Route path="modules" element={<Modules />} />
-        <Route path="modules/:id" element={<ModuleDetail />} />
-        <Route path="quizzes" element={<Quizzes />} />
-        <Route path="study-plan" element={<StudyPlan />} />
+        {/* Role-based redirect at /dashboard */}
+        <Route index element={<RoleRedirect />} />
+
+        {/* Student routes */}
+        <Route path="student" element={<RoleGuard allowedRoles={['student']}><Dashboard /></RoleGuard>} />
+        <Route path="tutor" element={<RoleGuard allowedRoles={['student']}><AITutor /></RoleGuard>} />
+        <Route path="courses" element={<RoleGuard allowedRoles={['student']}><Courses /></RoleGuard>} />
+        <Route path="courses/:id" element={<RoleGuard allowedRoles={['student']}><CourseDetail /></RoleGuard>} />
+        <Route path="modules" element={<RoleGuard allowedRoles={['student']}><Modules /></RoleGuard>} />
+        <Route path="modules/:id" element={<RoleGuard allowedRoles={['student']}><ModuleDetail /></RoleGuard>} />
+        <Route path="quizzes" element={<RoleGuard allowedRoles={['student']}><Quizzes /></RoleGuard>} />
+        <Route path="study-plan" element={<RoleGuard allowedRoles={['student']}><StudyPlan /></RoleGuard>} />
         <Route path="settings" element={<Settings />} />
-        <Route path="teacher" element={<TeacherDashboard />} />
-        <Route path="teacher/courses" element={<TeacherCourses />} />
-        <Route path="teacher/quizzes" element={<TeacherQuizzes />} />
-        <Route path="teacher/students" element={<TeacherStudents />} />
-        <Route path="admin/users" element={<AdminUsers />} />
-        <Route path="admin/courses" element={<AdminCourses />} />
-        <Route path="admin/activity" element={<AdminActivity />} />
+
+        {/* Teacher routes */}
+        <Route path="teacher" element={<RoleGuard allowedRoles={['teacher']}><TeacherDashboard /></RoleGuard>} />
+        <Route path="teacher/courses" element={<RoleGuard allowedRoles={['teacher']}><TeacherCourses /></RoleGuard>} />
+        <Route path="teacher/quizzes" element={<RoleGuard allowedRoles={['teacher']}><TeacherQuizzes /></RoleGuard>} />
+        <Route path="teacher/students" element={<RoleGuard allowedRoles={['teacher']}><TeacherStudents /></RoleGuard>} />
+
+        {/* Admin routes */}
+        <Route path="admin/users" element={<RoleGuard allowedRoles={['admin']}><AdminUsers /></RoleGuard>} />
+        <Route path="admin/courses" element={<RoleGuard allowedRoles={['admin']}><AdminCourses /></RoleGuard>} />
+        <Route path="admin/activity" element={<RoleGuard allowedRoles={['admin']}><AdminActivity /></RoleGuard>} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
