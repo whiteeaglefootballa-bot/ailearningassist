@@ -101,7 +101,7 @@ export default function Auth() {
         </motion.div>
 
         <div className="relative z-10 text-white/60 text-sm">
-          © 2024 AI Learning Assistant. All rights reserved.
+          © 2026 AI Learning Assistant. All rights reserved.
         </div>
 
         {/* Decorative elements */}
