@@ -335,7 +335,7 @@ export default function Index() {
             <span className="font-display font-bold">AI Learning Assistant</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2024 AI Learning Assistant. All rights reserved.
+            © 2026 AI Learning Assistant. All rights reserved.
           </p>
         </div>
       </footer>
